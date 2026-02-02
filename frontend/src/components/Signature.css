@@ -1,0 +1,43 @@
+.signature {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.signature .section-title {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #1f4788;
+  padding-bottom: 10px;
+}
+
+.signature .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.signature .form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.signature .form-group input {
+  padding: 8px 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.signature .form-group input:focus {
+  outline: none;
+  border-color: #1f4788;
+  box-shadow: 0 0 0 2px rgba(31, 71, 136, 0.1);
+}

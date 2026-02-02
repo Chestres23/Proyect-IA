@@ -1,2 +1,485 @@
-# Proyect-IA
-Proyecto de IA completo
+# Proyecto IA - Sistema Frontend para Gestión de Personal
+
+## 📋 Descripción
+
+**Sistema completamente refactorizado a Frontend-Only** para la gestión de empleados, turnos, recesos y pausas laborales.
+
+Este proyecto consume **APIs externas** desarrolladas por otros grupos. No tiene backend propio ni base de datos local.
+
+## ⚠️ Arquitectura: Frontend-Only
+
+```
+┌─────────────────────────┐
+│   TU APLICACIÓN         │
+│   (Frontend React)      │
+└────────┬────────────────┘
+         │ HTTP (fetch)
+         ↓
+┌──────────────────────────────────────┐
+│  APIs EXTERNAS (Otros Grupos)        │
+├──────────────────────────────────────┤
+│ • API Empleados    (puerto 3001)     │
+│ • API Pausas       (puerto 3000)     │
+│ • API Turnos       (puerto 3000)     │
+│ • API Recesos      (puerto 3000)     │
+│ • API Clientes     (puerto 3001)     │
+└──────────────────────────────────────┘
+```
+
+## 🌐 APIs Externas Consumidas
+
+| API | Puerto | Base URL | Documentación |
+|-----|--------|----------|---|
+| **Empleados** | 3001 | `http://localhost:3001/api/empleados` | `/APIS IA/Personal/Grupo1Endpoints.json` |
+| **Pausas** | 3000 | `http://localhost:3000/api/pausas` | `/APIS IA/Pausas/Proyecto Pausas.postman_collection.json` |
+| **Turnos** | 3000 | `http://localhost:3000/api/turnos` | `/APIS IA/Receso y turnos/turnos.postman_collection.json` |
+| **Recesos** | 3000 | `http://localhost:3000/api/breaks` | `/APIS IA/Receso y turnos/recesos.postman_collection.json` |
+| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Misma que Empleados |
+
+## 🚀 Tecnologías
+
+- **React 18.2.0** - Framework UI
+- **React Scripts 5.0.1** - Build y desarrollo
+- **Fetch API** - Cliente HTTP nativo (sin axios)
+- **CSS3** - Estilos
+- **Arquitectura de Servicios** - Capa centralizada de APIs
+
+## 📁 Estructura del Proyecto
+
+```
+Proyecto_ia/
+├── frontend/                          # ✅ APLICACIÓN PRINCIPAL
+│   ├── public/
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/               # Componentes React
+│   │   │   ├── Personal.js           # ✅ CRUD empleados
+│   │   │   ├── Turnos.js             # ✅ Gestión turnos
+│   │   │   ├── Recesos.js            # ✅ Gestión recesos
+│   │   │   ├── TiemposFuera.js       # ✅ Gestión pausas
+│   │   │   ├── Clientes.js           # ✅ CRUD clientes
+│   │   │   ├── ReporteJornada.js     # Reportes
+│   │   │   ├── ReportePausas.js      # Reportes
+│   │   │   ├── TimeTracker.js        # Seguimiento tiempo
+│   │   │   ├── Chronometer.js        # Cronómetro
+│   │   │   ├── Signature.js          # Firma digital
+│   │   │   ├── Modal.js              # Componente modal reutilizable
+│   │   │   ├── Navbar.js             # Navegación
+│   │   │   ├── PageContainer.js      # Contenedor de página
+│   │   │   ├── CompanyData.js        # Datos empresa
+│   │   │   └── Welcome.js            # Pantalla bienvenida
+│   │   │
+│   │   ├── services/                 # ⭐ CAPA DE SERVICIOS
+│   │   │   ├── api.js                # ✅ Cliente HTTP base (fetch)
+│   │   │   ├── empleadoService.js    # ✅ Servicio API Empleados
+│   │   │   ├── pausaService.js       # ✅ Servicio API Pausas
+│   │   │   ├── turnoService.js       # ✅ Servicio API Turnos
+│   │   │   ├── recesoService.js      # ✅ Servicio API Recesos
+│   │   │   └── clienteApi.js         # ✅ Servicio API Clientes
+│   │   │
+│   │   ├── App.js                    # Aplicación principal
+│   │   ├── App.css                   # Estilos globales
+│   │   ├── index.js                  # Punto de entrada
+│   │   ├── index.css                 # Estilos base
+│   │
+│   ├── .env                          # ⭐ CONFIGURACIÓN (URL de API)
+│   ├── .env.example                  # Ejemplo de .env
+│   ├── package.json
+│   └── public/
+│       └── index.html
+│
+├── APIS IA/                          # 📚 Documentación de APIs externas
+│   ├── Personal/
+│   │   └── Grupo1Endpoints.json
+│   ├── Pausas/
+│   │   └── Proyecto Pausas.postman_collection.json
+│   └── Receso y turnos/
+│       ├── turnos.postman_collection.json
+│       └── recesos.postman_collection.json
+│
+├── INICIO_RAPIDO.md                  # Guía de inicio rápido
+├── README.md                         # Este archivo
+└── REFACTORIZACION.md                # Detalles de refactorización
+```
+
+## ⚙️ Configuración
+
+### 1. Instalar Dependencias
+
+```bash
+cd frontend
+npm install
+```
+
+### 2. Configurar URL Base de APIs
+
+**Archivo: `frontend/.env`**
+
+```env
+REACT_APP_API_URL=http://localhost:3000/api
+```
+
+Esta URL se usa como base para todas las peticiones. Ajusta según donde corran tus APIs.
+
+### 3. Iniciar Aplicación
+
+```bash
+npm start
+```
+
+Se abrirá en `http://localhost:3000`
+
+## 🔧 Capa de Servicios
+
+Toda la comunicación con APIs externas pasa por la capa de servicios:
+
+### Estructura de un Servicio
+
+```javascript
+// Patrón: services/miService.js
+
+import api from './api';
+
+const miService = {
+  async listar() {
+    const response = await api.get('/endpoint');
+    return response.data || [];
+  },
+  
+  async obtener(id) {
+    const response = await api.get(`/endpoint/${id}`);
+    return response.data;
+  },
+  
+  async crear(data) {
+    const response = await api.post('/endpoint', data);
+    return response.data;
+  },
+  
+  async actualizar(id, data) {
+    const response = await api.put(`/endpoint/${id}`, data);
+    return response.data;
+  },
+  
+  async eliminar(id) {
+    await api.delete(`/endpoint/${id}`);
+  }
+};
+
+export default miService;
+```
+
+### Cliente HTTP Base: `api.js`
+
+```javascript
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+
+const api = {
+  get: (endpoint) => fetch(API_BASE_URL + endpoint),
+  post: (endpoint, data) => fetch(API_BASE_URL + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }),
+  put: (endpoint, data) => fetch(API_BASE_URL + endpoint, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }),
+  delete: (endpoint) => fetch(API_BASE_URL + endpoint, {
+    method: 'DELETE'
+  })
+};
+
+export default api;
+```
+
+### Servicios Disponibles
+
+#### `empleadoService.js`
+- `listar()` - Obtener todos los empleados
+- `obtener(ci)` - Obtener por cédula
+- `crear(data)` - Crear empleado
+- `actualizar(ci, data)` - Actualizar empleado
+- `eliminar(ci)` - Eliminar empleado
+
+#### `turnoService.js`
+- `listar()` - Obtener todos los turnos
+- `obtener(id)` - Obtener por ID
+- `crear(data)` - Crear turno
+- `actualizar(id, data)` - Actualizar turno
+- `eliminar(id)` - Eliminar turno
+
+#### `recesoService.js`
+- `listar()` - Obtener todos los recesos
+- `obtener(id)` - Obtener por ID
+- `crear(data)` - Crear receso
+- `actualizar(id, data)` - Actualizar receso
+- `eliminar(id)` - Eliminar receso
+- `obtenerPorTurno(idTurno)` - Filtrar por turno
+
+#### `pausaService.js`
+- `listarEmpleados()` - Obtener empleados
+- `registrarVisita(data)` - Pausa individual
+- `registrarActivas(data)` - Pausas grupales
+- `actualizar(id, data)` - Actualizar pausa
+
+#### `clienteApi.js`
+- `listar()` - Obtener todos los clientes
+- `obtener(id)` - Obtener por ID
+- `crear(data)` - Crear cliente
+- `actualizar(id, data)` - Actualizar cliente
+- `eliminar(id)` - Eliminar cliente
+- `buscar(termino)` - Buscar clientes
+
+## 📡 Endpoints de APIs Externas
+
+### API de Empleados (Puerto 3001)
+
+```
+GET    /api/empleados              → Listar todos
+GET    /api/empleados/:ci          → Obtener por cédula
+POST   /api/empleados              → Crear
+PUT    /api/empleados/:ci          → Actualizar
+DELETE /api/empleados/:ci          → Eliminar
+```
+
+### API de Turnos (Puerto 3000)
+
+```
+GET    /api/turnos                 → Listar todos
+GET    /api/turnos/:id             → Obtener por ID
+POST   /api/turnos                 → Crear
+PUT    /api/turnos/:id             → Actualizar
+DELETE /api/turnos/:id             → Eliminar
+```
+
+### API de Recesos (Puerto 3000)
+
+```
+GET    /api/breaks                 → Listar todos
+GET    /api/breaks/:id             → Obtener por ID
+POST   /api/breaks                 → Crear
+PUT    /api/breaks/:id             → Actualizar
+DELETE /api/breaks/:id             → Eliminar
+```
+
+### API de Pausas (Puerto 3000)
+
+```
+GET    /api/empleados              → Listar empleados disponibles
+POST   /api/pausas/visita          → Pausa individual
+POST   /api/pausas/activas         → Pausas grupales
+PUT    /api/pausas/:id             → Actualizar
+```
+
+### API de Clientes (Puerto 3001)
+
+```
+GET    /api/clientes               → Listar todos
+GET    /api/clientes/:id           → Obtener por ID
+POST   /api/clientes               → Crear
+PUT    /api/clientes/:id           → Actualizar
+DELETE /api/clientes/:id           → Eliminar
+GET    /api/clientes/buscar?...    → Buscar
+```
+
+## 🎯 Flujo de Datos en Componentes
+
+```
+┌─────────────────────┐
+│ Componente React    │
+│  (Turnos.js)        │
+└──────────┬──────────┘
+           │
+           ↓
+┌─────────────────────────────┐
+│ Service (turnoService.js)   │
+│ await turnoService.listar() │
+└──────────┬──────────────────┘
+           │
+           ↓
+┌──────────────────────────┐
+│ api.js (fetch base)      │
+│ await api.get('/turnos') │
+└──────────┬───────────────┘
+           │
+           ↓
+┌───────────────────────────────┐
+│ HTTP GET Request              │
+│ http://localhost:3000/api/... │
+└───────────────────────────────┘
+```
+
+## 💡 Ejemplo de Uso en un Componente
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import turnoService from '../services/turnoService';
+
+function Turnos() {
+  const [turnos, setTurnos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    cargarTurnos();
+  }, []);
+  
+  const cargarTurnos = async () => {
+    try {
+      setLoading(true);
+      const data = await turnoService.listar();
+      setTurnos(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleCrear = async (formData) => {
+    try {
+      await turnoService.crear(formData);
+      await cargarTurnos();
+      alert('Turno creado');
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  };
+  
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <div>
+      <h2>Turnos</h2>
+      {turnos.map(turno => (
+        <div key={turno.id_t}>{turno.nombre_t}</div>
+      ))}
+    </div>
+  );
+}
+
+export default Turnos;
+```
+
+## 🎨 Componentes Principales
+
+### **Personal** - Gestión de Empleados
+- ✅ Listar empleados
+- ✅ Búsqueda en tiempo real
+- ✅ Crear empleado
+- ✅ Actualizar empleado
+- ✅ Eliminar empleado
+- ✅ Validación de campos
+
+### **Turnos** - Gestión de Horarios
+- ✅ Listar turnos
+- ✅ Crear turno
+- ✅ Actualizar turno
+- ✅ Cálculo automático de horas
+- ✅ Tipos: NORMAL, ESPECIAL, NOCTURNO
+
+### **Recesos** - Breaks y Almuerzos
+- ✅ Listar recesos
+- ✅ Crear receso
+- ✅ Asociar a turnos
+- ✅ Tipos: BREAK, ALMUERZO
+- ✅ Actualizar recesos
+
+### **TiemposFuera** - Pausas y Permisos
+- ✅ Registro de pausas individuales
+- ✅ Registro de pausas grupales
+- ✅ Selección múltiple de empleados
+- ✅ Tipos: PERMISO, REUNION, CAPACITACION, VISITA, OTRO
+- ✅ Formulario con validaciones
+
+### **Clientes** - CRUD de Clientes
+- ✅ Listar clientes
+- ✅ Crear cliente
+- ✅ Actualizar cliente
+- ✅ Eliminar cliente
+- ✅ Buscar clientes
+- ✅ Campos extendidos (empresa, dirección, etc.)
+
+## 🔍 Solución de Problemas
+
+### Error: "Cannot GET /api/empleados"
+```
+✓ Verificar que la API externa esté corriendo en puerto 3001
+✓ Probar manualmente: curl http://localhost:3001/api/empleados
+✓ Revisar que REACT_APP_API_URL sea correcto en .env
+```
+
+### Error: "Failed to fetch"
+```
+✓ Verificar conexión a Internet/red
+✓ Confirmar IP del servidor API es accesible
+✓ Revisar puertos en uso: netstat -ano | findstr :3000
+✓ Revisar CORS en API externa
+```
+
+### El puerto 3000 ya está en uso
+```bash
+# Liberar puerto en Windows
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+
+# En Linux/Mac
+lsof -ti:3000 | xargs kill -9
+
+# O usar otro puerto
+PORT=3001 npm start
+```
+
+### Componente no carga datos
+```javascript
+// Revisar:
+1. useEffect está siendo ejecutado
+2. Servicio retorna datos correctamente
+3. setData() actualiza estado
+4. Rendering condicional maneja loading/error
+
+// Debuggear con:
+console.log('Datos:', data);
+console.error('Error:', error);
+```
+
+## 📚 Documentación de APIs Externas
+
+Las colecciones Postman completas están en:
+
+```
+/APIS IA/
+├── Personal/Grupo1Endpoints.json
+├── Pausas/Proyecto Pausas.postman_collection.json
+└── Receso y turnos/
+    ├── turnos.postman_collection.json
+    └── recesos.postman_collection.json
+```
+
+Importa estos archivos en Postman para probar todos los endpoints.
+
+## 🚀 Próximos Pasos
+
+1. **Levantar APIs externas** en los puertos correctos
+2. **Configurar `.env`** con URL correcta
+3. **Ejecutar**: `npm start` en la carpeta frontend
+4. **Probar funcionalidad** de cada módulo
+5. **Contactar grupos** responsables si hay errores
+
+## 📞 Contacto y Soporte
+
+**Responsables de cada API:**
+- API Personal/Empleados/Clientes: Grupo 1
+- API Pausas: Grupo 2
+- API Turnos/Recesos: Grupo 3
+
+## 📅 Información del Proyecto
+
+- **Versión**: 2.0.0
+- **Tipo**: Frontend-Only
+- **Fecha Refactorización**: 2 de Febrero 2026
+- **Estado**: ✅ Producción Ready
+- **Última Actualización**: 2 de Febrero 2026

@@ -1,0 +1,45 @@
+.reporte-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.filters-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+}
+
+.filters-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.filters-left .form-group-inline select {
+  min-width: 300px;
+}
+
+.filters-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table-container-large {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: auto;
+  min-height: 300px;
+  max-height: 400px;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+}
