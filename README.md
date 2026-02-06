@@ -2,9 +2,10 @@
 
 ## 📋 Descripción
 
-**Sistema completamente refactorizado a Frontend-Only** para la gestión de empleados, turnos, recesos y pausas laborales.
+**Sistema completamente refactorizado a Frontend-Only** para la gestión de empleados, turnos, recesos, pausas y firmas.
 
 Este proyecto consume **APIs externas** desarrolladas por otros grupos. No tiene backend propio ni base de datos local.
+Incluye un **gate de verificación facial** antes de entrar y un **chatbot** flotante de soporte en toda la app.
 
 ## ⚠️ Arquitectura: Frontend-Only
 
@@ -31,10 +32,12 @@ Este proyecto consume **APIs externas** desarrolladas por otros grupos. No tiene
 | API | Puerto | Base URL | Documentación |
 |-----|--------|----------|---|
 | **Empleados** | 3001 | `http://localhost:3001/api/empleados` | `/APIS IA/Personal/Grupo1Endpoints.json` |
+| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Misma que Empleados |
+| **Firma** | 3001 | `http://localhost:3001/api/firmas` | Swagger local `/docs` en API de Firma |
 | **Pausas** | 3000 | `http://localhost:3000/api/pausas` | `/APIS IA/Pausas/Proyecto Pausas.postman_collection.json` |
 | **Turnos** | 3000 | `http://localhost:3000/api/turnos` | `/APIS IA/Receso y turnos/turnos.postman_collection.json` |
 | **Recesos** | 3000 | `http://localhost:3000/api/breaks` | `/APIS IA/Receso y turnos/recesos.postman_collection.json` |
-| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Misma que Empleados |
+| **ChatBot** | 3005 | `http://localhost:3005/api/chat` | Postman `chatbot.postman_collection.json` |
 
 ## 🚀 Tecnologías
 
@@ -58,6 +61,8 @@ Proyecto_ia/
 │   │   │   ├── Recesos.js            # ✅ Gestión recesos
 │   │   │   ├── TiemposFuera.js       # ✅ Gestión pausas
 │   │   │   ├── Clientes.js           # ✅ CRUD clientes
+|   │   │   ├── FaceGate.js           # ✅ Verificación facial + Firma
+|   │   │   ├── ChatBotWidget.js      # ✅ Chatbot flotante
 │   │   │   ├── ReporteJornada.js     # Reportes
 │   │   │   ├── ReportePausas.js      # Reportes
 │   │   │   ├── TimeTracker.js        # Seguimiento tiempo
@@ -75,7 +80,9 @@ Proyecto_ia/
 │   │   │   ├── pausaService.js       # ✅ Servicio API Pausas
 │   │   │   ├── turnoService.js       # ✅ Servicio API Turnos
 │   │   │   ├── recesoService.js      # ✅ Servicio API Recesos
-│   │   │   └── clienteApi.js         # ✅ Servicio API Clientes
+|   │   │   ├── clienteApi.js         # ✅ Servicio API Clientes
+|   │   │   ├── firmaService.js       # ✅ Servicio API Firma
+|   │   │   └── chatbotService.js     # ✅ Servicio API ChatBot
 │   │   │
 │   │   ├── App.js                    # Aplicación principal
 │   │   ├── App.css                   # Estilos globales
@@ -89,17 +96,18 @@ Proyecto_ia/
 │       └── index.html
 │
 ├── APIS IA/                          # 📚 Documentación de APIs externas
-│   ├── Personal/
-│   │   └── Grupo1Endpoints.json
-│   ├── Pausas/
-│   │   └── Proyecto Pausas.postman_collection.json
-│   └── Receso y turnos/
-│       ├── turnos.postman_collection.json
-│       └── recesos.postman_collection.json
-│
+|   ├── Personal/
+|   │   └── Grupo1Endpoints.json
+|   ├── Pausas/
+|   │   └── Proyecto Pausas.postman_collection.json
+|   └── Receso y turnos/
+|       ├── turnos.postman_collection.json
+|       └── recesos.postman_collection.json
+|
 ├── INICIO_RAPIDO.md                  # Guía de inicio rápido
+├── EXPLICACION_ENV.md                # Guía de variables de entorno
 ├── README.md                         # Este archivo
-└── REFACTORIZACION.md                # Detalles de refactorización
+├── REFACTORIZACION.md                # Detalles de refactorización
 ```
 
 ## ⚙️ Configuración
@@ -111,15 +119,25 @@ cd frontend
 npm install
 ```
 
-### 2. Configurar URL Base de APIs
+### 2. Configurar URLs de APIs
 
 **Archivo: `frontend/.env`**
 
 ```env
+# API General (Pausas, Turnos, Recesos)
 REACT_APP_API_URL=http://localhost:3000/api
+
+# API Personal (Empleados/Clientes)
+REACT_APP_PERSONAL_API_URL=http://localhost:3001/api
+
+# API Firma
+REACT_APP_FIRMA_API_URL=http://localhost:3001
+
+# API ChatBot
+REACT_APP_CHATBOT_API_URL=http://localhost:3005
 ```
 
-Esta URL se usa como base para todas las peticiones. Ajusta según donde corran tus APIs.
+Estas URLs se usan como base para cada servicio. Ajusta según donde corran tus APIs.
 
 ### 3. Iniciar Aplicación
 
@@ -232,6 +250,14 @@ export default api;
 - `eliminar(id)` - Eliminar cliente
 - `buscar(termino)` - Buscar clientes
 
+#### `firmaService.js`
+- `validarEmpleado(ci)` - Validar empleado por CI
+- `registrar(ci)` - Registrar evento de firma del día
+- `obtener(ci, fecha)` - Consultar firma por CI y fecha
+
+#### `chatbotService.js`
+- `chat(message)` - Enviar mensaje al chatbot
+
 ## 📡 Endpoints de APIs Externas
 
 ### API de Empleados (Puerto 3001)
@@ -282,6 +308,21 @@ POST   /api/clientes               → Crear
 PUT    /api/clientes/:id           → Actualizar
 DELETE /api/clientes/:id           → Eliminar
 GET    /api/clientes/buscar?...    → Buscar
+```
+
+### API de Firma (Puerto 3001)
+
+```
+POST   /api/firmas/registrar       → Registrar evento del día
+POST   /api/firmas/cargar-ausentes → Auto completar ausentes
+GET    /api/firmas/:ci             → Consultar firma (fecha opcional)
+GET    /api/empleados/:ci          → Validar empleado
+```
+
+### API de ChatBot (Puerto 3005)
+
+```
+POST   /api/chat                   → Respuesta de asistente
 ```
 
 ## 🎯 Flujo de Datos en Componentes
@@ -366,6 +407,19 @@ export default Turnos;
 
 ## 🎨 Componentes Principales
 
+<<<<<<< HEAD
+=======
+### **FaceGate** - Verificación Facial + Firma
+- ✅ Bloquea el acceso hasta detectar rostro
+- ✅ Panel de firma y validación
+- ✅ Registro de firma con API externa
+
+### **ChatBot** - Asistente Flotante
+- ✅ Visible en toda la app (excepto FaceGate)
+- ✅ Respuesta en tiempo real vía API
+- ✅ Botón flotante con icono
+
+>>>>>>> 693df9f (Initial commit - Proyect-IA)
 ### **Personal** - Gestión de Empleados
 - ✅ Listar empleados
 - ✅ Búsqueda en tiempo real
@@ -420,6 +474,22 @@ export default Turnos;
 ✓ Revisar CORS en API externa
 ```
 
+<<<<<<< HEAD
+=======
+### Error: "No se pudo iniciar la camara"
+```
+✓ Verificar permisos de cámara del navegador
+✓ En producción usar HTTPS (la cámara no funciona en HTTP)
+✓ Probar en localhost primero
+```
+
+### Error: "Error en el chat"
+```
+✓ Verificar que la API ChatBot esté corriendo
+✓ Confirmar REACT_APP_CHATBOT_API_URL en .env
+```
+
+>>>>>>> 693df9f (Initial commit - Proyect-IA)
 ### El puerto 3000 ya está en uso
 ```bash
 # Liberar puerto en Windows
@@ -448,6 +518,7 @@ console.error('Error:', error);
 
 ## 📚 Documentación de APIs Externas
 
+<<<<<<< HEAD
 Las colecciones Postman completas están en:
 
 ```
@@ -460,6 +531,10 @@ Las colecciones Postman completas están en:
 ```
 
 Importa estos archivos en Postman para probar todos los endpoints.
+=======
+Las colecciones Postman y Swagger están en las carpetas de cada grupo (ejemplo: `NUEVAS APIS/`).
+Importa los archivos en Postman o abre Swagger para probar los endpoints.
+>>>>>>> 693df9f (Initial commit - Proyect-IA)
 
 ## 🚀 Próximos Pasos
 
@@ -482,4 +557,8 @@ Importa estos archivos en Postman para probar todos los endpoints.
 - **Tipo**: Frontend-Only
 - **Fecha Refactorización**: 2 de Febrero 2026
 - **Estado**: ✅ Producción Ready
+<<<<<<< HEAD
 - **Última Actualización**: 2 de Febrero 2026
+=======
+- **Última Actualización**: 6 de Febrero 2026
+>>>>>>> 693df9f (Initial commit - Proyect-IA)

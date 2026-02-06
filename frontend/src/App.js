@@ -8,9 +8,12 @@ import Recesos from './components/Recesos';
 import TiemposFuera from './components/TiemposFuera';
 import ReporteJornada from './components/ReporteJornada';
 import ReportePausas from './components/ReportePausas';
+import FaceGate from './components/FaceGate';
+import ChatBotWidget from './components/ChatBotWidget';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(null);
+  const [faceVerified, setFaceVerified] = useState(false);
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
@@ -39,6 +42,10 @@ function App() {
     }
   };
 
+  if (!faceVerified) {
+    return <FaceGate onVerified={() => setFaceVerified(true)} />;
+  }
+
   return (
     <div className="App">
       <Navbar onNavigate={handleNavigate} currentPage={currentPage} />
@@ -46,6 +53,8 @@ function App() {
       <div className="main-content">
         {renderPage()}
       </div>
+
+      <ChatBotWidget />
     </div>
   );
 }
