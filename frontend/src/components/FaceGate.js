@@ -56,7 +56,13 @@ function FaceGate({ onVerified }) {
     };
 
     const startVideo = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -67,13 +73,18 @@ function FaceGate({ onVerified }) {
     const startDetection = () => {
       if (!videoRef.current) return;
 
+      const detectorOptions = new window.faceapi.TinyFaceDetectorOptions({
+        inputSize: 416,
+        scoreThreshold: 0.4
+      });
+
       intervalRef.current = setInterval(async () => {
         if (!videoRef.current || videoRef.current.readyState < 2) return;
-        const detections = await window.faceapi.detectAllFaces(
+        const detection = await window.faceapi.detectSingleFace(
           videoRef.current,
-          new window.faceapi.TinyFaceDetectorOptions()
+          detectorOptions
         );
-        const hasFace = detections.length > 0;
+        const hasFace = Boolean(detection);
         setFaceDetected((prev) => (prev !== hasFace ? hasFace : prev));
         setStatusText(hasFace ? "Persona detectada" : "Camara vacia");
         if (!hasFace) {
