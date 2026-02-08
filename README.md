@@ -1,8 +1,8 @@
-# Proyecto IA - Sistema Frontend para Gestión de Personal
+# Proyecto IA - Sistema Frontend para Gestion de Personal
 
 ## 📋 Descripción
 
-**Sistema completamente refactorizado a Frontend-Only** para la gestión de empleados, turnos, recesos, pausas y firmas.
+**Sistema completamente refactorizado a Frontend-Only** para la gestion de empleados, turnos, recesos, pausas y firmas.
 
 Este proyecto consume **APIs externas** desarrolladas por otros grupos. No tiene backend propio ni base de datos local.
 Incluye un **gate de verificación facial** antes de entrar y un **chatbot** flotante de soporte en toda la app.
@@ -24,20 +24,22 @@ Incluye un **gate de verificación facial** antes de entrar y un **chatbot** flo
 │ • API Turnos       (puerto 3000)     │
 │ • API Recesos      (puerto 3000)     │
 │ • API Clientes     (puerto 3001)     │
+│ • API Firma        (puerto 3001)     │
+│ • API ChatBot      (puerto 3005)     │
 └──────────────────────────────────────┘
 ```
 
 ## 🌐 APIs Externas Consumidas
 
-| API | Puerto | Base URL | Documentación |
+| API | Puerto | Base URL | Documentacion |
 |-----|--------|----------|---|
-| **Empleados** | 3001 | `http://localhost:3001/api/empleados` | `/APIS IA/Personal/Grupo1Endpoints.json` |
-| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Misma que Empleados |
-| **Firma** | 3001 | `http://localhost:3001/api/firmas` | Swagger local `/docs` en API de Firma |
-| **Pausas** | 3000 | `http://localhost:3000/api/pausas` | `/APIS IA/Pausas/Proyecto Pausas.postman_collection.json` |
-| **Turnos** | 3000 | `http://localhost:3000/api/turnos` | `/APIS IA/Receso y turnos/turnos.postman_collection.json` |
-| **Recesos** | 3000 | `http://localhost:3000/api/breaks` | `/APIS IA/Receso y turnos/recesos.postman_collection.json` |
-| **ChatBot** | 3005 | `http://localhost:3005/api/chat` | Postman `chatbot.postman_collection.json` |
+| **Empleados** | 3001 | `http://localhost:3001/api/empleados` | Documentacion del equipo de Personal |
+| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Documentacion del equipo de Personal |
+| **Firma** | 3001 | `http://localhost:3001/api/firmas` | Swagger del equipo de Firma |
+| **Pausas** | 3000 | `http://localhost:3000/api/pausas` | Postman del equipo de Pausas |
+| **Turnos** | 3000 | `http://localhost:3000/api/turnos` | Postman del equipo de Turnos |
+| **Recesos** | 3000 | `http://localhost:3000/api/breaks` | Postman del equipo de Recesos |
+| **ChatBot** | 3005 | `http://localhost:3005/api/chat` | Postman del equipo de ChatBot |
 
 ## 🚀 Tecnologías
 
@@ -50,27 +52,27 @@ Incluye un **gate de verificación facial** antes de entrar y un **chatbot** flo
 ## 📁 Estructura del Proyecto
 
 ```
-Proyecto_ia/
-├── frontend/                          # ✅ APLICACIÓN PRINCIPAL
+Proyect-IA/
+├── frontend/                          # ✅ APLICACION PRINCIPAL
 │   ├── public/
 │   │   └── index.html
 │   ├── src/
 │   │   ├── components/               # Componentes React
 │   │   │   ├── Personal.js           # ✅ CRUD empleados
-│   │   │   ├── Turnos.js             # ✅ Gestión turnos
-│   │   │   ├── Recesos.js            # ✅ Gestión recesos
-│   │   │   ├── TiemposFuera.js       # ✅ Gestión pausas
+│   │   │   ├── Turnos.js             # ✅ Gestion turnos
+│   │   │   ├── Recesos.js            # ✅ Gestion recesos
+│   │   │   ├── TiemposFuera.js       # ✅ Gestion pausas
 │   │   │   ├── Clientes.js           # ✅ CRUD clientes
-|   │   │   ├── FaceGate.js           # ✅ Verificación facial + Firma
-|   │   │   ├── ChatBotWidget.js      # ✅ Chatbot flotante
+│   │   │   ├── FaceGate.js           # ✅ Verificacion facial + Firma
+│   │   │   ├── ChatBotWidget.js      # ✅ Chatbot flotante
 │   │   │   ├── ReporteJornada.js     # Reportes
 │   │   │   ├── ReportePausas.js      # Reportes
 │   │   │   ├── TimeTracker.js        # Seguimiento tiempo
-│   │   │   ├── Chronometer.js        # Cronómetro
+│   │   │   ├── Chronometer.js        # Cronometro
 │   │   │   ├── Signature.js          # Firma digital
 │   │   │   ├── Modal.js              # Componente modal reutilizable
-│   │   │   ├── Navbar.js             # Navegación
-│   │   │   ├── PageContainer.js      # Contenedor de página
+│   │   │   ├── Navbar.js             # Navegacion
+│   │   │   ├── PageContainer.js      # Contenedor de pagina
 │   │   │   ├── CompanyData.js        # Datos empresa
 │   │   │   └── Welcome.js            # Pantalla bienvenida
 │   │   │
@@ -80,34 +82,23 @@ Proyecto_ia/
 │   │   │   ├── pausaService.js       # ✅ Servicio API Pausas
 │   │   │   ├── turnoService.js       # ✅ Servicio API Turnos
 │   │   │   ├── recesoService.js      # ✅ Servicio API Recesos
-|   │   │   ├── clienteApi.js         # ✅ Servicio API Clientes
-|   │   │   ├── firmaService.js       # ✅ Servicio API Firma
-|   │   │   └── chatbotService.js     # ✅ Servicio API ChatBot
+│   │   │   ├── clienteApi.js         # ✅ Servicio API Clientes
+│   │   │   ├── firmaService.js       # ✅ Servicio API Firma
+│   │   │   └── chatbotService.js     # ✅ Servicio API ChatBot
 │   │   │
-│   │   ├── App.js                    # Aplicación principal
+│   │   ├── App.js                    # Aplicacion principal
 │   │   ├── App.css                   # Estilos globales
 │   │   ├── index.js                  # Punto de entrada
 │   │   ├── index.css                 # Estilos base
 │   │
-│   ├── .env                          # ⭐ CONFIGURACIÓN (URL de API)
+│   ├── .env                          # ⭐ CONFIGURACION (URL de API)
 │   ├── .env.example                  # Ejemplo de .env
 │   ├── package.json
-│   └── public/
-│       └── index.html
+│   └── .gitignore
 │
-├── APIS IA/                          # 📚 Documentación de APIs externas
-|   ├── Personal/
-|   │   └── Grupo1Endpoints.json
-|   ├── Pausas/
-|   │   └── Proyecto Pausas.postman_collection.json
-|   └── Receso y turnos/
-|       ├── turnos.postman_collection.json
-|       └── recesos.postman_collection.json
-|
-├── INICIO_RAPIDO.md                  # Guía de inicio rápido
-├── EXPLICACION_ENV.md                # Guía de variables de entorno
+├── INICIO_RAPIDO.md                  # Guia de inicio rapido
+├── EXPLICACION_ENV.md                # Guia de variables de entorno
 ├── README.md                         # Este archivo
-├── REFACTORIZACION.md                # Detalles de refactorización
 ```
 
 ## ⚙️ Configuración
@@ -406,9 +397,6 @@ export default Turnos;
 ```
 
 ## 🎨 Componentes Principales
-
-<<<<<<< HEAD
-=======
 ### **FaceGate** - Verificación Facial + Firma
 - ✅ Bloquea el acceso hasta detectar rostro
 - ✅ Panel de firma y validación
@@ -418,8 +406,6 @@ export default Turnos;
 - ✅ Visible en toda la app (excepto FaceGate)
 - ✅ Respuesta en tiempo real vía API
 - ✅ Botón flotante con icono
-
->>>>>>> 693df9f (Initial commit - Proyect-IA)
 ### **Personal** - Gestión de Empleados
 - ✅ Listar empleados
 - ✅ Búsqueda en tiempo real
@@ -473,9 +459,6 @@ export default Turnos;
 ✓ Revisar puertos en uso: netstat -ano | findstr :3000
 ✓ Revisar CORS en API externa
 ```
-
-<<<<<<< HEAD
-=======
 ### Error: "No se pudo iniciar la camara"
 ```
 ✓ Verificar permisos de cámara del navegador
@@ -489,7 +472,6 @@ export default Turnos;
 ✓ Confirmar REACT_APP_CHATBOT_API_URL en .env
 ```
 
->>>>>>> 693df9f (Initial commit - Proyect-IA)
 ### El puerto 3000 ya está en uso
 ```bash
 # Liberar puerto en Windows
@@ -518,23 +500,8 @@ console.error('Error:', error);
 
 ## 📚 Documentación de APIs Externas
 
-<<<<<<< HEAD
-Las colecciones Postman completas están en:
-
-```
-/APIS IA/
-├── Personal/Grupo1Endpoints.json
-├── Pausas/Proyecto Pausas.postman_collection.json
-└── Receso y turnos/
-    ├── turnos.postman_collection.json
-    └── recesos.postman_collection.json
-```
-
-Importa estos archivos en Postman para probar todos los endpoints.
-=======
-Las colecciones Postman y Swagger están en las carpetas de cada grupo (ejemplo: `NUEVAS APIS/`).
-Importa los archivos en Postman o abre Swagger para probar los endpoints.
->>>>>>> 693df9f (Initial commit - Proyect-IA)
+La documentación (Postman o Swagger) debe ser provista por cada grupo dueño de su API.
+Importa las colecciones en Postman o abre Swagger para probar los endpoints.
 
 ## 🚀 Próximos Pasos
 
@@ -557,8 +524,4 @@ Importa los archivos en Postman o abre Swagger para probar los endpoints.
 - **Tipo**: Frontend-Only
 - **Fecha Refactorización**: 2 de Febrero 2026
 - **Estado**: ✅ Producción Ready
-<<<<<<< HEAD
-- **Última Actualización**: 2 de Febrero 2026
-=======
-- **Última Actualización**: 6 de Febrero 2026
->>>>>>> 693df9f (Initial commit - Proyect-IA)
+- **Última Actualización**: 8 de Febrero 2026
