@@ -1,4 +1,59 @@
-import api from './api';
+// URL específica para API de Turnos
+const TURNOS_API_URL =
+  process.env.REACT_APP_TURNOS_API_URL || 'http://169.254.67.87:3007/api';
+
+async function turnosApiRequest(endpoint, options = {}) {
+  const url = `${TURNOS_API_URL}${endpoint}`;
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  try {
+    const response = await fetch(url, config);
+
+    if (response.status === 204) {
+      return { ok: true, data: null };
+    }
+
+    const contentType = response.headers.get('content-type');
+    let data = null;
+
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    }
+
+    if (!response.ok) {
+      const errorMessage = data?.mensaje || data?.error || data?.message || `Error HTTP: ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error en API Turnos:', {
+      endpoint,
+      error: error.message,
+    });
+    throw error;
+  }
+}
+
+const turnosApi = {
+  get: (endpoint) => turnosApiRequest(endpoint, { method: 'GET' }),
+  post: (endpoint, data) => turnosApiRequest(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  put: (endpoint, data) => turnosApiRequest(endpoint, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  delete: (endpoint) => turnosApiRequest(endpoint, { method: 'DELETE' }),
+};
 
 /**
  * ============================================================================
@@ -21,7 +76,7 @@ const turnoService = {
    */
   async listar() {
     try {
-      const response = await api.get('/turnos');
+      const response = await turnosApi.get('/turnos');
       
       // La API retorna formato: {ok: true, data: [...]}
       if (response && response.data) {
@@ -47,7 +102,7 @@ const turnoService = {
    */
   async obtener(id) {
     try {
-      const response = await api.get(`/turnos/${id}`);
+      const response = await turnosApi.get(`/turnos/${id}`);
       
       if (response && response.data) {
         return response.data;
@@ -73,7 +128,7 @@ const turnoService = {
    */
   async crear(turnoData) {
     try {
-      const response = await api.post('/turnos', turnoData);
+      const response = await turnosApi.post('/turnos', turnoData);
       
       if (response && response.data) {
         return response.data;
@@ -95,7 +150,7 @@ const turnoService = {
    */
   async actualizar(id, turnoData) {
     try {
-      const response = await api.put(`/turnos/${id}`, turnoData);
+      const response = await turnosApi.put(`/turnos/${id}`, turnoData);
       
       if (response && response.data) {
         return response.data;
@@ -116,7 +171,7 @@ const turnoService = {
    */
   async eliminar(id) {
     try {
-      const response = await api.delete(`/turnos/${id}`);
+      const response = await turnosApi.delete(`/turnos/${id}`);
       
       return response || { ok: true };
     } catch (error) {

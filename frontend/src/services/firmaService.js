@@ -8,7 +8,7 @@
  */
 
 const FIRMA_API_URL =
-  process.env.REACT_APP_FIRMA_API_URL || "http://localhost:3001";
+  process.env.REACT_APP_FIRMA_API_URL || "http://169.254.71.161:3002";
 
 async function firmaApiRequest(endpoint, options = {}) {
   const url = `${FIRMA_API_URL}${endpoint}`;

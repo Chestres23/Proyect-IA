@@ -8,7 +8,7 @@
  */
 
 // URL específica para API de Clientes (puerto 3001, mismo que Personal)
-const CLIENTES_API_URL = process.env.REACT_APP_PERSONAL_API_URL || 'http://localhost:3001/api';
+const CLIENTES_API_URL = process.env.REACT_APP_PERSONAL_API_URL || 'http://169.254.122.45:3001/api';
 
 /**
  * Cliente HTTP específico para API de Clientes

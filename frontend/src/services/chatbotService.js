@@ -6,7 +6,7 @@
  */
 
 const CHATBOT_API_URL =
-  process.env.REACT_APP_CHATBOT_API_URL || "http://localhost:3005";
+  process.env.REACT_APP_CHATBOT_API_URL || "http://169.254.67.87:3005";
 
 async function chatbotRequest(endpoint, options = {}) {
   const url = `${CHATBOT_API_URL}${endpoint}`;

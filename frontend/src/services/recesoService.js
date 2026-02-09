@@ -1,4 +1,59 @@
-import api from './api';
+// URL específica para API de Recesos
+const RECESOS_API_URL =
+  process.env.REACT_APP_RECESOS_API_URL || 'http://169.254.67.87:3006/api';
+
+async function recesosApiRequest(endpoint, options = {}) {
+  const url = `${RECESOS_API_URL}${endpoint}`;
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  try {
+    const response = await fetch(url, config);
+
+    if (response.status === 204) {
+      return { ok: true, data: null };
+    }
+
+    const contentType = response.headers.get('content-type');
+    let data = null;
+
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    }
+
+    if (!response.ok) {
+      const errorMessage = data?.mensaje || data?.error || data?.message || `Error HTTP: ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error en API Recesos:', {
+      endpoint,
+      error: error.message,
+    });
+    throw error;
+  }
+}
+
+const recesosApi = {
+  get: (endpoint) => recesosApiRequest(endpoint, { method: 'GET' }),
+  post: (endpoint, data) => recesosApiRequest(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  put: (endpoint, data) => recesosApiRequest(endpoint, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  delete: (endpoint) => recesosApiRequest(endpoint, { method: 'DELETE' }),
+};
 
 /**
  * ============================================================================
@@ -21,7 +76,7 @@ const recesoService = {
    */
   async listar() {
     try {
-      const response = await api.get('/breaks');
+      const response = await recesosApi.get('/breaks');
       
       // La API retorna formato: {ok: true, data: [...]}
       if (response && response.data) {
@@ -47,7 +102,7 @@ const recesoService = {
    */
   async obtener(id) {
     try {
-      const response = await api.get(`/breaks/${id}`);
+      const response = await recesosApi.get(`/breaks/${id}`);
       
       if (response && response.data) {
         return response.data;
@@ -75,7 +130,7 @@ const recesoService = {
    */
   async crear(recesoData) {
     try {
-      const response = await api.post('/breaks', recesoData);
+      const response = await recesosApi.post('/breaks', recesoData);
       
       if (response && response.data) {
         return response.data;
@@ -97,7 +152,7 @@ const recesoService = {
    */
   async actualizar(id, recesoData) {
     try {
-      const response = await api.put(`/breaks/${id}`, recesoData);
+      const response = await recesosApi.put(`/breaks/${id}`, recesoData);
       
       if (response && response.data) {
         return response.data;
@@ -118,7 +173,7 @@ const recesoService = {
    */
   async eliminar(id) {
     try {
-      const response = await api.delete(`/breaks/${id}`);
+      const response = await recesosApi.delete(`/breaks/${id}`);
       
       return response || { ok: true };
     } catch (error) {
