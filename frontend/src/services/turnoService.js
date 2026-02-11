@@ -1,4 +1,16 @@
-// URL específica para API de Turnos
+/**
+ * ============================================================================
+ * Servicio de Turnos
+ * ============================================================================
+ * Consume la API externa de Turnos desarrollada por otro grupo.
+ * Endpoint base: /api/turnos
+ * 
+ * Documentación: /APIS IA/Receso y turnos/turnos.postman_collection.json
+ * 
+ * Los turnos definen los horarios de trabajo de los empleados.
+ * ============================================================================
+ */
+
 const TURNOS_API_URL =
   process.env.REACT_APP_TURNOS_API_URL || 'http://169.254.67.87:3007/api';
 
@@ -36,7 +48,7 @@ async function turnosApiRequest(endpoint, options = {}) {
   } catch (error) {
     console.error('Error en API Turnos:', {
       endpoint,
-      error: error.message,
+      error: error.message
     });
     throw error;
   }
@@ -46,27 +58,14 @@ const turnosApi = {
   get: (endpoint) => turnosApiRequest(endpoint, { method: 'GET' }),
   post: (endpoint, data) => turnosApiRequest(endpoint, {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   }),
   put: (endpoint, data) => turnosApiRequest(endpoint, {
     method: 'PUT',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   }),
-  delete: (endpoint) => turnosApiRequest(endpoint, { method: 'DELETE' }),
+  delete: (endpoint) => turnosApiRequest(endpoint, { method: 'DELETE' })
 };
-
-/**
- * ============================================================================
- * Servicio de Turnos
- * ============================================================================
- * Consume la API externa de Turnos desarrollada por otro grupo.
- * Endpoint base: /api/turnos
- * 
- * Documentación: /APIS IA/Receso y turnos/turnos.postman_collection.json
- * 
- * Los turnos definen los horarios de trabajo de los empleados.
- * ============================================================================
- */
 
 const turnoService = {
   /**

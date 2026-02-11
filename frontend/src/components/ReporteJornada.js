@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ReporteJornada.css';
 import PageContainer from './PageContainer';
+import empleadoService from '../services/empleadoService';
 
-const empleadosOptions = [
-  { value: 'todos', label: 'Todos' },
-  { value: '1', label: 'AGUILAR FONTE ERIKA MABEL' },
-  { value: '2', label: 'CASTILLO MERIZALDE GERMAN EMIL' },
-  { value: '3', label: 'GALARZA GARCIA DAVID ESTEBAN' },
-  { value: '4', label: 'HEREDIA LOPEZ EDSON ANDRES' },
-];
+const FIRMA_API_URL = process.env.REACT_APP_FIRMA_API_URL || 'http://localhost:3002';
 
-const sampleData = [
-  { ci: '17257536', fecha: '2026-01-14', nombres: 'ERIKA', apellidos: 'AGUILAR', ingreso: '08:30:00', salida: '17:30:00', inicioBreak: '10:30:00', regresoBreak: '10:45:00', inicioAlm: '12:30:00', regresoAlm: '13:30:00', atrasoBreak: '00:00:00', atrasoAlm: '00:00:00', almuerzo: '01:00:00', observacion: '' },
-  { ci: '17266433', fecha: '2026-01-14', nombres: 'GERMAN', apellidos: 'CASTILLO', ingreso: '09:00:00', salida: '18:00:00', inicioBreak: '11:00:00', regresoBreak: '11:15:00', inicioAlm: '13:00:00', regresoAlm: '14:00:00', atrasoBreak: '00:00:00', atrasoAlm: '00:00:00', almuerzo: '01:00:00', observacion: '' },
-];
+function toCsvValue(value) {
+  const safe = value === null || value === undefined ? '' : String(value);
+  const escaped = safe.replace(/"/g, '""');
+  return `"${escaped}"`;
+}
+
+function downloadCsv({ rows, columns, filename }) {
+  const header = columns.map((col) => col.label).map(toCsvValue).join(',');
+  const lines = rows.map((row) =>
+    columns.map((col) => toCsvValue(row[col.key])).join(',')
+  );
+  const csv = [header, ...lines].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function formatDateOnly(value) {
+  if (!value) return '';
+  const raw = String(value);
+  return raw.includes('T') ? raw.split('T')[0] : raw;
+}
 
 function ReporteJornada({ onGoBack }) {
   const [filters, setFilters] = useState({
@@ -23,22 +42,56 @@ function ReporteJornada({ onGoBack }) {
   });
   const [data, setData] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [empleados, setEmpleados] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const formatDateDisplay = (dateStr) => {
-    const date = new Date(dateStr);
-    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  };
+  useEffect(() => {
+    const cargarEmpleados = async () => {
+      try {
+        const lista = await empleadoService.listar();
+        setEmpleados(Array.isArray(lista) ? lista : []);
+      } catch (error) {
+        console.error('Error cargando empleados:', error);
+        setEmpleados([]);
+      }
+    };
+
+    cargarEmpleados();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleConsultar = () => {
-    // Simular consulta
-    setData(sampleData);
-    setHasSearched(true);
+  const handleConsultar = async () => {
+    const params = new URLSearchParams({
+      fechaInicio: filters.fechaInicio,
+      fechaFin: filters.fechaFin,
+    });
+
+    if (filters.empleado !== 'todos') {
+      params.append('ci', filters.empleado);
+    }
+
+    try {
+      setErrorMessage('');
+      const response = await fetch(`${FIRMA_API_URL}/api/reportes/jornada?${params.toString()}`);
+      const payload = await response.json();
+
+      if (!response.ok || !payload?.ok) {
+        const message = payload?.message || 'Error al consultar el reporte';
+        throw new Error(message);
+      }
+
+      setData(Array.isArray(payload.data) ? payload.data : []);
+      setHasSearched(true);
+    } catch (error) {
+      console.error('Error consultando reporte:', error);
+      setData([]);
+      setHasSearched(true);
+      setErrorMessage('No se pudo consultar el reporte. Intenta nuevamente.');
+    }
   };
 
   const handleExportar = () => {
@@ -46,8 +99,28 @@ function ReporteJornada({ onGoBack }) {
       alert('No hay datos para exportar');
       return;
     }
-    alert('Exportando datos...');
-    // Aquí iría la lógica de exportación
+    const columns = [
+      { key: 'ci', label: 'CI' },
+      { key: 'fecha', label: 'FECHA' },
+      { key: 'nombres', label: 'NOMBRES' },
+      { key: 'apellidos', label: 'APELLIDOS' },
+      { key: 'ingreso', label: 'INGRESO' },
+      { key: 'salida', label: 'SALIDA' },
+      { key: 'inicio_break', label: 'INICIO BREAK' },
+      { key: 'regreso_break', label: 'REGRESO BREAK' },
+      { key: 'inicio_alm', label: 'INICIO ALM' },
+      { key: 'regreso_alm', label: 'REGRESO ALM' },
+      { key: 'atraso_break', label: 'ATRASO BREAK' },
+      { key: 'atraso_alm', label: 'ATRASO ALM' },
+      { key: 'almuerzo', label: 'ALMUERZO' },
+      { key: 'observacion', label: 'OBSERVACION' },
+    ];
+    const filename = `reporte_jornada_${filters.fechaInicio}_${filters.fechaFin}.csv`;
+    const exportRows = data.map((row) => ({
+      ...row,
+      fecha: formatDateOnly(row.fecha),
+    }));
+    downloadCsv({ rows: exportRows, columns, filename });
   };
 
   return (
@@ -85,8 +158,11 @@ function ReporteJornada({ onGoBack }) {
                   value={filters.empleado}
                   onChange={handleInputChange}
                 >
-                  {empleadosOptions.map((emp) => (
-                    <option key={emp.value} value={emp.value}>{emp.label}</option>
+                  <option value="todos">Todos</option>
+                  {empleados.map((emp) => (
+                    <option key={emp.ci} value={emp.ci}>
+                      {`${emp.apellidos} ${emp.nombres}`}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -124,17 +200,17 @@ function ReporteJornada({ onGoBack }) {
                 data.map((row, index) => (
                   <tr key={index}>
                     <td>{row.ci}</td>
-                    <td>{row.fecha}</td>
+                    <td>{formatDateOnly(row.fecha)}</td>
                     <td>{row.nombres}</td>
                     <td>{row.apellidos}</td>
                     <td>{row.ingreso}</td>
                     <td>{row.salida}</td>
-                    <td>{row.inicioBreak}</td>
-                    <td>{row.regresoBreak}</td>
-                    <td>{row.inicioAlm}</td>
-                    <td>{row.regresoAlm}</td>
-                    <td>{row.atrasoBreak}</td>
-                    <td>{row.atrasoAlm}</td>
+                    <td>{row.inicio_break}</td>
+                    <td>{row.regreso_break}</td>
+                    <td>{row.inicio_alm}</td>
+                    <td>{row.regreso_alm}</td>
+                    <td>{row.atraso_break}</td>
+                    <td>{row.atraso_alm}</td>
                     <td>{row.almuerzo}</td>
                     <td>{row.observacion}</td>
                   </tr>
@@ -142,7 +218,11 @@ function ReporteJornada({ onGoBack }) {
               ) : (
                 <tr>
                   <td colSpan="14" className="empty-message">
-                    {hasSearched ? 'No se encontraron resultados' : 'Presione Consultar para buscar'}
+                    {errorMessage
+                      ? errorMessage
+                      : hasSearched
+                        ? 'No hay registros para el rango seleccionado'
+                        : 'Presione Consultar para buscar'}
                   </td>
                 </tr>
               )}

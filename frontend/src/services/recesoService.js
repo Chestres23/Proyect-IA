@@ -1,4 +1,16 @@
-// URL específica para API de Recesos
+/**
+ * ============================================================================
+ * Servicio de Recesos (Breaks)
+ * ============================================================================
+ * Consume la API externa de Recesos desarrollada por otro grupo.
+ * Endpoint base: /api/breaks
+ * 
+ * Documentación: /APIS IA/Receso y turnos/recesos.postman_collection.json
+ * 
+ * Los recesos son pausas programadas asociadas a turnos (breaks, almuerzos, etc.)
+ * ============================================================================
+ */
+
 const RECESOS_API_URL =
   process.env.REACT_APP_RECESOS_API_URL || 'http://169.254.67.87:3006/api';
 
@@ -36,7 +48,7 @@ async function recesosApiRequest(endpoint, options = {}) {
   } catch (error) {
     console.error('Error en API Recesos:', {
       endpoint,
-      error: error.message,
+      error: error.message
     });
     throw error;
   }
@@ -46,27 +58,14 @@ const recesosApi = {
   get: (endpoint) => recesosApiRequest(endpoint, { method: 'GET' }),
   post: (endpoint, data) => recesosApiRequest(endpoint, {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   }),
   put: (endpoint, data) => recesosApiRequest(endpoint, {
     method: 'PUT',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   }),
-  delete: (endpoint) => recesosApiRequest(endpoint, { method: 'DELETE' }),
+  delete: (endpoint) => recesosApiRequest(endpoint, { method: 'DELETE' })
 };
-
-/**
- * ============================================================================
- * Servicio de Recesos (Breaks)
- * ============================================================================
- * Consume la API externa de Recesos desarrollada por otro grupo.
- * Endpoint base: /api/breaks
- * 
- * Documentación: /APIS IA/Receso y turnos/recesos.postman_collection.json
- * 
- * Los recesos son pausas programadas asociadas a turnos (breaks, almuerzos, etc.)
- * ============================================================================
- */
 
 const recesoService = {
   /**

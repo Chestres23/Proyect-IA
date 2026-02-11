@@ -1,10 +1,26 @@
-// URLs separadas para pausas (visitas y activas)
+/**
+ * ============================================================================
+ * Servicio de Pausas
+ * ============================================================================
+ * Consume la API externa de Pausas desarrollada por otro grupo.
+ * Endpoint base: /api/pausas
+ * 
+ * Documentación: /APIS IA/Pausas/Proyecto Pausas.postman_collection.json
+ * 
+ * Tipos de pausas:
+ * - Visita (Individual): V_clientes, V_proveedores, etc.
+ * - Capacitación (Grupal - Activa): C_interna, C_externa
+ * ============================================================================
+ */
+
+const PERSONAL_API_URL =
+  process.env.REACT_APP_PERSONAL_API_URL || 'http://169.254.122.45:3001/api';
 const PAUSAS_VISITAS_API_URL =
-  process.env.REACT_APP_PAUSAS_VISITAS_API_URL || 'http://169.254.122.45:3000/api';
+  process.env.REACT_APP_PAUSAS_VISITAS_API_URL || 'http://169.254.122.45:5173/api';
 const PAUSAS_ACTIVAS_API_URL =
   process.env.REACT_APP_PAUSAS_ACTIVAS_API_URL || 'http://169.254.122.45:5174/api';
 
-async function pausaApiRequest(baseUrl, endpoint, options = {}) {
+async function pausasApiRequest(baseUrl, endpoint, options = {}) {
   const url = `${baseUrl}${endpoint}`;
 
   const config = {
@@ -38,45 +54,33 @@ async function pausaApiRequest(baseUrl, endpoint, options = {}) {
   } catch (error) {
     console.error('Error en API Pausas:', {
       endpoint,
-      error: error.message,
+      error: error.message
     });
     throw error;
   }
 }
 
-const pausaVisitasApi = {
-  get: (endpoint) => pausaApiRequest(PAUSAS_VISITAS_API_URL, endpoint, { method: 'GET' }),
-  post: (endpoint, data) => pausaApiRequest(PAUSAS_VISITAS_API_URL, endpoint, {
+const personalApi = {
+  get: (endpoint) => pausasApiRequest(PERSONAL_API_URL, endpoint, { method: 'GET' })
+};
+
+const pausasVisitasApi = {
+  post: (endpoint, data) => pausasApiRequest(PAUSAS_VISITAS_API_URL, endpoint, {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   }),
-  put: (endpoint, data) => pausaApiRequest(PAUSAS_VISITAS_API_URL, endpoint, {
+  put: (endpoint, data) => pausasApiRequest(PAUSAS_VISITAS_API_URL, endpoint, {
     method: 'PUT',
-    body: JSON.stringify(data),
-  }),
+    body: JSON.stringify(data)
+  })
 };
 
-const pausaActivasApi = {
-  post: (endpoint, data) => pausaApiRequest(PAUSAS_ACTIVAS_API_URL, endpoint, {
+const pausasActivasApi = {
+  post: (endpoint, data) => pausasApiRequest(PAUSAS_ACTIVAS_API_URL, endpoint, {
     method: 'POST',
-    body: JSON.stringify(data),
-  }),
+    body: JSON.stringify(data)
+  })
 };
-
-/**
- * ============================================================================
- * Servicio de Pausas
- * ============================================================================
- * Consume la API externa de Pausas desarrollada por otro grupo.
- * Endpoint base: /api/pausas
- * 
- * Documentación: /APIS IA/Pausas/Proyecto Pausas.postman_collection.json
- * 
- * Tipos de pausas:
- * - Visita (Individual): V_clientes, V_proveedores, etc.
- * - Capacitación (Grupal - Activa): C_interna, C_externa
- * ============================================================================
- */
 
 const pausaService = {
   /**
@@ -86,7 +90,7 @@ const pausaService = {
    */
   async listarEmpleados() {
     try {
-      const response = await pausaVisitasApi.get('/empleados');
+      const response = await personalApi.get('/empleados');
       
       if (response && response.data) {
         return Array.isArray(response.data) ? response.data : [];
@@ -115,7 +119,7 @@ const pausaService = {
    */
   async registrarVisita(pausaData) {
     try {
-      const response = await pausaVisitasApi.post('/pausas/visita', pausaData);
+      const response = await pausasVisitasApi.post('/pausas/visita', pausaData);
       
       if (response && response.data) {
         return response.data;
@@ -143,7 +147,7 @@ const pausaService = {
    */
   async registrarActivas(pausaData) {
     try {
-      const response = await pausaActivasApi.post('/pausas/activas', pausaData);
+      const response = await pausasActivasApi.post('/pausas/activas', pausaData);
       
       if (response && response.data) {
         return response.data;
@@ -166,7 +170,7 @@ const pausaService = {
    */
   async actualizar(id, pausaData) {
     try {
-      const response = await pausaVisitasApi.put(`/pausas/${id}`, pausaData);
+      const response = await pausasVisitasApi.put(`/pausas/${id}`, pausaData);
       
       if (response && response.data) {
         return response.data;

@@ -18,8 +18,14 @@ function Personal({ onGoBack }) {
     direccion: '',
     telefonos: '',
     correo: '',
-    fecha_na: ''
+    fecha_nacimiento: ''
   });
+
+  const formatDateOnly = (value) => {
+    if (!value) return '';
+    const raw = String(value);
+    return raw.includes('T') ? raw.split('T')[0] : raw;
+  };
 
   // Cargar empleados al montar el componente
   useEffect(() => {
@@ -56,7 +62,7 @@ function Personal({ onGoBack }) {
       direccion: row.direccion || '',
       telefonos: row.telefonos || '',
       correo: row.correo || '',
-      fecha_na: row.fecha_na || ''
+      fecha_nacimiento: formatDateOnly(row.fecha_nacimiento)
     });
     setShowModal(true);
   };
@@ -74,19 +80,32 @@ function Personal({ onGoBack }) {
 
     try {
       setLoading(true);
+
+      const today = new Date().toISOString().slice(0, 10);
+      const payload = {
+        ci: formData.ci,
+        nombres: formData.nombres,
+        apellidos: formData.apellidos,
+        direccion: formData.direccion,
+        telefonos: formData.telefonos,
+        correo: formData.correo,
+        fecha_nacimiento: formData.fecha_nacimiento,
+      };
       
       if (selectedRow) {
         // Actualizar empleado existente
-        await empleadoService.actualizar(selectedRow.ci, formData);
+        await empleadoService.actualizar(selectedRow.ci, payload);
         alert('Empleado actualizado correctamente');
       } else {
         // Crear nuevo empleado
         const nuevoEmpleado = {
-          ...formData,
+          ...payload,
           id_a: 1,  // Area por defecto
           id_t: 1,  // Turno por defecto
           id_b: 1,  // Break por defecto
-          salario: 0
+          salario: 0,
+          fecha_ingreso: today,
+          fecha_contrato: today
         };
         await empleadoService.crear(nuevoEmpleado);
         alert('Empleado creado correctamente');
@@ -113,7 +132,7 @@ function Personal({ onGoBack }) {
       direccion: '',
       telefonos: '',
       correo: '',
-      fecha_na: ''
+      fecha_nacimiento: ''
     });
   };
 
@@ -163,7 +182,7 @@ function Personal({ onGoBack }) {
                   <th>Direccion</th>
                   <th>Telefonos</th>
                   <th>Correo</th>
-                  <th>FechaNa</th>
+                  <th>Fecha</th>
                   <th>Salario</th>
                 </tr>
               </thead>
@@ -182,7 +201,7 @@ function Personal({ onGoBack }) {
                     <td>{p.direccion}</td>
                     <td>{p.telefonos}</td>
                     <td>{p.correo}</td>
-                    <td>{p.fecha_na}</td>
+                    <td>{formatDateOnly(p.fecha_nacimiento)}</td>
                     <td>{p.salario}</td>
                   </tr>
                 ))}
@@ -250,11 +269,11 @@ function Personal({ onGoBack }) {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Fecha de nacimiento:</label>
+                  <label>Fecha:</label>
                   <input 
                     type="date" 
-                    name="fecha_na"
-                    value={formData.fecha_na}
+                    name="fecha_nacimiento"
+                    value={formData.fecha_nacimiento}
                     onChange={handleInputChange}
                   />
                 </div>

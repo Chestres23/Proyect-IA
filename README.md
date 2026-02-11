@@ -2,44 +2,51 @@
 
 ## 📋 Descripción
 
-**Sistema completamente refactorizado a Frontend-Only** para la gestion de empleados, turnos, recesos, pausas y firmas.
+Sistema de gestion de personal con frontend React y un conjunto de APIs backend dockerizadas.
 
-Este proyecto consume **APIs externas** desarrolladas por otros grupos. No tiene backend propio ni base de datos local.
-Incluye un **gate de verificación facial** antes de entrar y un **chatbot** flotante de soporte en toda la app.
+El frontend consume APIs propias (carpeta Proyecto IA/Back Apis) y usa Postgres compartido. Incluye verificacion facial y un chatbot flotante de soporte.
 
-## ⚠️ Arquitectura: Frontend-Only
+## 🧱 Arquitectura
 
 ```
 ┌─────────────────────────┐
-│   TU APLICACIÓN         │
-│   (Frontend React)      │
+│   Frontend React        │
+│   (Proyect-IA/frontend) │
 └────────┬────────────────┘
          │ HTTP (fetch)
          ↓
 ┌──────────────────────────────────────┐
-│  APIs EXTERNAS (Otros Grupos)        │
+│  APIs Backend (Docker Compose)       │
 ├──────────────────────────────────────┤
-│ • API Empleados    (puerto 3001)     │
-│ • API Pausas       (puerto 3000)     │
-│ • API Turnos       (puerto 3000)     │
-│ • API Recesos      (puerto 3000)     │
-│ • API Clientes     (puerto 3001)     │
-│ • API Firma        (puerto 3001)     │
-│ • API ChatBot      (puerto 3005)     │
+│ • Personal API     (3001)            │
+│ • Firma API        (3002)            │
+│ • Recesos API      (3006)            │
+│ • Turnos API       (3007)            │
+│ • Pausas Visitas   (5173)            │
+│ • Pausas Activas   (5174)            │
+│ • Chatbot API      (3005)            │
 └──────────────────────────────────────┘
+         │
+         ↓
+┌─────────────────────────┐
+│ PostgreSQL (5432)       │
+└─────────────────────────┘
 ```
 
-## 🌐 APIs Externas Consumidas
+## 🌐 APIs Consumidas
 
 | API | Puerto | Base URL | Documentacion |
 |-----|--------|----------|---|
-| **Empleados** | 3001 | `http://localhost:3001/api/empleados` | Documentacion del equipo de Personal |
-| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Documentacion del equipo de Personal |
-| **Firma** | 3001 | `http://localhost:3001/api/firmas` | Swagger del equipo de Firma |
-| **Pausas** | 3000 | `http://localhost:3000/api/pausas` | Postman del equipo de Pausas |
-| **Turnos** | 3000 | `http://localhost:3000/api/turnos` | Postman del equipo de Turnos |
-| **Recesos** | 3000 | `http://localhost:3000/api/breaks` | Postman del equipo de Recesos |
-| **ChatBot** | 3005 | `http://localhost:3005/api/chat` | Postman del equipo de ChatBot |
+| **Empleados** | 3001 | `http://localhost:3001/api/empleados` | Personal API |
+| **Clientes** | 3001 | `http://localhost:3001/api/clientes` | Personal API |
+| **Firma** | 3002 | `http://localhost:3002/api/firmas` | Swagger en /docs |
+| **Reporte Jornada** | 3002 | `http://localhost:3002/api/reportes/jornada` | Reportes |
+| **Pausas Visitas** | 5173 | `http://localhost:5173/api/pausas/visita` | Pausas API |
+| **Reporte Pausas** | 5173 | `http://localhost:5173/api/reportes/pausas` | Reportes |
+| **Pausas Activas** | 5174 | `http://localhost:5174/api/pausas/activas` | Pausas API |
+| **Turnos** | 3007 | `http://localhost:3007/api/turnos` | Turnos API |
+| **Recesos** | 3006 | `http://localhost:3006/api/breaks` | Recesos API |
+| **ChatBot** | 3005 | `http://localhost:3005/api/chat` | Chatbot API |
 
 ## 🚀 Tecnologías
 
@@ -115,17 +122,22 @@ npm install
 **Archivo: `frontend/.env`**
 
 ```env
-# API General (Pausas, Turnos, Recesos)
-REACT_APP_API_URL=http://localhost:3000/api
-
-# API Personal (Empleados/Clientes)
+# Personal / Empleados / Clientes
 REACT_APP_PERSONAL_API_URL=http://localhost:3001/api
 
-# API Firma
-REACT_APP_FIRMA_API_URL=http://localhost:3001
+# Firma
+REACT_APP_FIRMA_API_URL=http://localhost:3002
 
-# API ChatBot
+# Pausas (Visitas y Activas)
+REACT_APP_PAUSAS_VISITAS_API_URL=http://localhost:5173/api
+REACT_APP_PAUSAS_ACTIVAS_API_URL=http://localhost:5174/api
+
+# Chatbot
 REACT_APP_CHATBOT_API_URL=http://localhost:3005
+
+# Recesos y Turnos
+REACT_APP_RECESOS_API_URL=http://localhost:3006/api
+REACT_APP_TURNOS_API_URL=http://localhost:3007/api
 ```
 
 Estas URLs se usan como base para cada servicio. Ajusta según donde corran tus APIs.
@@ -137,6 +149,29 @@ npm start
 ```
 
 Se abrirá en `http://localhost:3000`
+
+## 🐳 Backend con Docker
+
+La dockerizacion de las APIs se ejecuta desde la carpeta:
+`Proyecto IA/Back Apis`
+
+Comando principal:
+
+```bash
+docker-compose up --build
+```
+
+Para correr en segundo plano:
+
+```bash
+docker-compose up -d --build
+```
+
+Para detener:
+
+```bash
+docker-compose down
+```
 
 ## 🔧 Capa de Servicios
 
